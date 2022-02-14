@@ -5,15 +5,8 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# app.config['MYSQL_HOST'] = '192.168.122.53'
-# app.config['MYSQL_USER'] = 'flask'
-# app.config['MYSQL_PASSWORD'] = 'flask'
-# app.config['MYSQL_DATABASE'] = 'flaskdb'
-
-# mydb = mysql.connector.connect(app)
-
 mydb = mysql.connector.connect(
-    host='192.168.122.53',
+    host='localhost',
     user='flask',
     password='flask',
     database='flaskdb'
