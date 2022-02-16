@@ -2,20 +2,27 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
+import os
 
 app = Flask(__name__)
 
+# MySQL Connection
 mydb = mysql.connector.connect(
-    host='localhost',
-    user='flask',
-    password='flask',
-    database='flaskdb'
+    host=os.environ.get('FLASK_DATABASE_HOST'),
+    user=os.environ.get('FLASK_DATABASE_USER'),
+    password=os.environ.get('FLASK_DATABASE_PASSWORD'),
+    database=os.environ.get('FLASK_DATABASE')
 )
 
+# Settings
+app.secret_key = 'mysecretkey'
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    cur = mydb.cursor()
+    cur.execute('SELECT * FROM contacts')
+    data = cur.fetchall()
+    return render_template('index.html', contacts = data)
 
 @app.route('/add_contact', methods=['POST'])
 def add_contact():
@@ -30,7 +37,7 @@ def add_contact():
 
         mydb.commit()
 
-        print("Conctact added")
+        flash('Contact added successfully')
         
         return redirect(url_for('index'))
 
@@ -38,14 +45,13 @@ def add_contact():
 def edit_contact():
     return 'Edit contact'
 
-@app.route('/delete')
-def delete_contact():
+@app.route('/delete/<string:id>')
+def delete_contact(id):
     cur = mydb.cursor()
-    cur.execute('DELETE FROM contacts')
-
+    cur.execute('DELETE FROM contacts WHERE contact_ID = {0}'.format(id))
     mydb.commit()
-    
-    print('--All rows deleted--')
+
+    flash('Contact removed successfully')
 
     return redirect(url_for('index'))
 
