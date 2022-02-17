@@ -2,16 +2,18 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
+import mariadb
 import os
 
 app = Flask(__name__)
 
 # MySQL Connection
-mydb = mysql.connector.connect(
+mydb = mariadb.connect(
     host=os.environ.get('FLASK_DATABASE_HOST'),
     user=os.environ.get('FLASK_DATABASE_USER'),
     password=os.environ.get('FLASK_DATABASE_PASSWORD'),
-    database=os.environ.get('FLASK_DATABASE')
+    database=os.environ.get('FLASK_DATABASE'),
+    port=3306
 )
 
 # Settings
@@ -41,9 +43,16 @@ def add_contact():
         
         return redirect(url_for('index'))
 
-@app.route('/edit')
-def edit_contact():
-    return 'Edit contact'
+@app.route('/edit/<id>')
+def edit_contact(id):
+    cur = mydb.cursor()
+    cur.execute('SELECT * FROM contacts WHERE contact_ID = {0}'.format(id))
+
+    data = cur.fetchall()
+
+    print(data[0])
+    return 'received'
+
 
 @app.route('/delete/<string:id>')
 def delete_contact(id):
@@ -59,4 +68,4 @@ if __name__ == '__main__':
     app.run(port = 3000, debug = True)
      
 
-## Crear sesión (https://www.youtube.com/watch?v=IgCfZkR8wME&t=1471s - 33:47)
+## Crear sesión (https://www.youtube.com/watch?v=IgCfZkR8wME&t=1471s - 51:34)
